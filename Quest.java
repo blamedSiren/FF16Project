@@ -14,10 +14,10 @@ public class Quest extends JFrame{
         JLabel label = new JLabel("Quests");
         JButton mainButton = new JButton("Back to Main Menu");
 
-        label.setBounds(850, 50, 200, 50);
+        label.setBounds((screenSize.width / 2) - 50, screenSize.height / 8, 200, 50);
 
         mainButton.setSize(200, 400);
-        mainButton.setBounds(200, 350, mainButton.getWidth(), mainButton.getHeight());
+        mainButton.setBounds(screenSize.width / 15, screenSize.height / 3, mainButton.getWidth(), mainButton.getHeight());
 
         mainButton.addActionListener(new ActionListener() {
             @Override

@@ -12,30 +12,26 @@ import java.io.FileReader;
 import java.util.Random;
 
 
-
-
 class EikonList extends JFrame{
     private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private JLabel currentSkillLabel = null;
     public EikonList(){
         super("Eikons");
-        setLayout(null);
-        JLabel label = new JLabel("Eikon List");
+        setLayout(new BorderLayout());
+        JLabel label = new JLabel("Eikon List", SwingConstants.CENTER);
         JButton mainButton = new JButton("Back to Main Menu");
         JButton ranButton = new JButton("Randomize Eikons");
+        JLabel skill = new JLabel();
         File userSkills = new File("skills.txt");
-        
-        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 500, 450));
         if(userSkills.length() == 0){
             new startupSkills();
             dispose();
         }
         else if(userSkills.length() != 0){
-        label.setBounds((screenSize.width / 2) - 50, screenSize.height / 8, 200, 50);
 
-        mainButton.setSize(200, 400);
-        mainButton.setBounds((screenSize.width / 6) - 225, (screenSize.height * 1/3) + 25, mainButton.getWidth(), mainButton.getHeight());
-
+        mainButton.setPreferredSize(new Dimension(250, 500));
         mainButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -44,31 +40,30 @@ class EikonList extends JFrame{
              }
           });
 
-        ranButton.setSize(200, 400);
-        ranButton.setBounds((screenSize.width / 2) + 850, (screenSize.height / 3) + 5, ranButton.getWidth(), ranButton.getHeight());
-
+        ranButton.setPreferredSize(new Dimension(250, 500));
         ranButton.addActionListener(new ActionListener(){
             
             @Override
             public void actionPerformed(ActionEvent e){
                 String skillText = randomize();
-                JLabel skill = new JLabel();
                 if(currentSkillLabel != null){
                     getContentPane().remove(currentSkillLabel);
                 }
                 skill.setText("<html>" + skillText.replace("\n", "<br>") + "</html>");
-                skill.setSize(750, 750);
-                skill.setBounds((screenSize.width / 2) - 100, (screenSize.height / 2) - 400, 750, 750);
-                add(skill);
                 currentSkillLabel = skill;
                 revalidate();
                 repaint();
-                setVisible(true);
             }
         });
+        skill.setPreferredSize(new Dimension(500, 500));
+        skill.setHorizontalAlignment(SwingConstants.CENTER);
+        skill.setVerticalAlignment(SwingConstants.TOP);
+
+        buttonPanel.add(mainButton);
+        buttonPanel.add(skill);
+        buttonPanel.add(ranButton);
         add(label);
-        add(mainButton);
-        add(ranButton);
+        add(buttonPanel);
 
 
         setBounds(0,0, screenSize.width, screenSize.height);

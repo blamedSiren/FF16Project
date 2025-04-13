@@ -14,30 +14,27 @@ public class Main extends JFrame{
 
     public Main(){
         super("Main Menu");
-        setLayout(null);
-        JLabel label = new JLabel("Main Menu");
+        setLayout(new BorderLayout()); // Use BorderLayout for overall window layout
+        JLabel label = new JLabel("Main Menu", SwingConstants.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 550, 450)); // FlowLayout for center alignment and spacing between buttons
+        
         JButton questButton = new JButton("Quests");
         JButton eikonButton = new JButton("Eikons");
         JButton editSkills = new JButton("Edit Skills");
-        
-        label.setBounds((screenSize.width / 2) - 50, screenSize.height / 8, 200, 50);
 
-        questButton.setSize(200, 400);
-        questButton.setBounds((screenSize.width / 12), (screenSize.height / 3) + 2, questButton.getWidth(), questButton.getHeight());
-
+        questButton.setPreferredSize(new Dimension(250, 500));
         questButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new Quest();
                 dispose();
-             }
-          });
+            }
+        });
 
-          editSkills.setSize(200, 400);
-          editSkills.setBounds(screenSize.width / 6, (screenSize.height / 3) + 2, editSkills.getWidth(), editSkills.getHeight());
-
-          editSkills.addActionListener(new ActionListener(){
-            
+        editSkills.setPreferredSize(new Dimension(250, 500));
+        editSkills.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 String[] skills = {
                     "Will o' the Wykes", "Limit Break", "Ignition", "Rising Flames", "Heatwave",
@@ -48,85 +45,90 @@ public class Main extends JFrame{
                     "Rime", "Ice Age", "Mesmerize", "Cold Snap", "Gungnir", "Heaven's Cloud", "Rift Slip", 
                     "Arm of Darkness", "Dancing Steel"
                 };
+        
                 ArrayList<String> skillsList = new ArrayList<>();
                 Collections.addAll(skillsList, skills);
-                try(FileReader userSkills = new FileReader("skills.txt")){
-                    BufferedReader r = new BufferedReader(userSkills);
-                    String l;
-                    while((l =r.readLine()) != null){
-                        for(String p: skills){
-                            if(l.equals(p)){
-                                skillsList.remove(p);
-                            }
-                        }
-                    }   
-                    JFrame skill = new JFrame("Update Skills");
-                    JCheckBox[] boxes = new JCheckBox[skills.length];
-                    JPanel checkboxPanel = new JPanel();
-                    JButton submit = new JButton();
-                    JPanel buttonPanel = new JPanel();
-                    buttonPanel.add(submit);
-                    skill.add(checkboxPanel);
-                    skill.add(buttonPanel, BorderLayout.SOUTH); 
-                    // Set Layout for JPanel to make the checkboxes stack properly
-                    //checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS));
-                    for (int i = 0; i < skills.length; i++) {
-                        boxes[i] = new JCheckBox(skillsList.get(i));
-                        checkboxPanel.add(boxes[i]);
+        
+                // Read current skills from the file and mark them as selected
+                ArrayList<String> existingSkills = new ArrayList<>();
+                try (BufferedReader r = new BufferedReader(new FileReader("skills.txt"))) {
+                    String line;
+                    while ((line = r.readLine()) != null) {
+                        existingSkills.add(line.trim());  // Collect existing skills
                     }
-                    
-                    try(BufferedReader reader = new BufferedReader(userSkills)){
-                        String currentLine;
-                        String line;
-                        while((line = reader.readLine()) != null){
-                            for(int i = 0; i < boxes.length; i++){
-                                currentLine = boxes[i].getText();
-                                if(line.equals(currentLine)){
-                                    continue;
-                                }
-                                else{
-                                    try(FileWriter writer = new FileWriter("skills.txt", true)){
-                                        if(boxes[i].isSelected()){
-                                        writer.write(skillsList.get(i) + "\n");
-                                        }           
-                                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+        
+                // Create the JFrame for updating skills
+                JFrame skill = new JFrame("Update Skills");
+                JCheckBox[] boxes = new JCheckBox[skillsList.size()];
+                JPanel checkboxPanel = new JPanel();
+                checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS)); // Stack checkboxes vertically
+        
+                // Create checkboxes for all skills
+                for (int i = 0; i < skillsList.size(); i++) {
+                    boxes[i] = new JCheckBox(skillsList.get(i));
+                    // Set the checkbox selected if the skill is in the existing skills list
+                    if (existingSkills.contains(skillsList.get(i))) {
+                        boxes[i].setSelected(true);
+                    }
+                    checkboxPanel.add(boxes[i]);
+                }
+        
+                // Add submit button
+                JButton submit = new JButton("Submit");
+                submit.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        // Append selected skills back to the file
+                        try (FileWriter writer = new FileWriter("skills.txt", true)) {
+                            for (int i = 0; i < boxes.length; i++) {
+                                if (boxes[i].isSelected() && !existingSkills.contains(boxes[i].getText())) {
+                                    writer.write(boxes[i].getText() + "\n"); // Only append if not already in the file
                                 }
                             }
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
                         }
-                        reader.close();
+                        skill.dispose(); // Close the skill window
                     }
-                    skill.setSize(1000, 1000);  // Adjust size as needed
-                    skill.setLocation((screenSize.width - skill.getWidth()) / 2, (screenSize.height - skill.getHeight()) / 2);
-                    submit.setSize(400, 400);
-                    skill.setVisible(true);
-                    skill.setBounds(0, 0, screenSize.width, screenSize.height);
-                }
-                catch(IOException p){
-                    System.out.println(p);
-                }
-                
+                });
+        
+                // Set layout and add components
+                JPanel buttonPanel2 = new JPanel();
+                buttonPanel2.add(submit);
+                skill.add(checkboxPanel, BorderLayout.CENTER);
+                skill.add(buttonPanel2, BorderLayout.SOUTH); // Submit button at the bottom
+        
+                // Final JFrame setup
+                skill.setSize(500, 600); // Adjust size to fit checkboxes and button
+                skill.setLocation((screenSize.width - skill.getWidth()) / 2, (screenSize.height - skill.getHeight()) / 2);
+                skill.setVisible(true);
+                skill.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close without exiting app
             }
         });
-          eikonButton.setSize(200, 400);
-          eikonButton.setBounds((screenSize.width / 2) + 850, (screenSize.height / 3) + 5, eikonButton.getWidth(), eikonButton.getHeight());
+        
+        
 
-          eikonButton.addActionListener(new ActionListener() {
+        eikonButton.setPreferredSize(new Dimension(250, 500));
+        eikonButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
                 dispose();
                 new EikonList();
-                
             }
-          });
+        });
 
-          add(label);
-          add(questButton);
-          add(editSkills);
-          add(eikonButton);
+        buttonPanel.add(questButton);
+        buttonPanel.add(editSkills);
+        buttonPanel.add(eikonButton);
 
-          setBounds(0,0, screenSize.width, screenSize.height);
-          setVisible(true);
-          
-          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        add(label, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.CENTER);
+
+        setBounds(0,0, screenSize.width, screenSize.height);
+        setVisible(true);
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

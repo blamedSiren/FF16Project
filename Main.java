@@ -14,15 +14,31 @@ public class Main extends JFrame{
 
     public Main(){
         super("Main Menu");
+        getContentPane().setBackground(new Color(14, 0, 0));
         setLayout(new BorderLayout()); // Use BorderLayout for overall window layout
         JLabel label = new JLabel("Main Menu", SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.BOLD, 48));
+
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(14, 0, 0));
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 550, 450)); // FlowLayout for center alignment and spacing between buttons
         
         JButton questButton = new JButton("Quests");
+        questButton.setFont(new Font("Arial", Font.PLAIN, 24));
+        questButton.setBackground(new Color(64, 74, 86));
+        questButton.setForeground(Color.WHITE); 
+
         JButton eikonButton = new JButton("Eikons");
+        eikonButton.setFont(new Font("Arial", Font.PLAIN, 24));
+        eikonButton.setBackground(new Color(64, 74, 86));
+        eikonButton.setForeground(Color.WHITE); 
+
         JButton editSkills = new JButton("Edit Skills");
+        editSkills.setFont(new Font("Arial", Font.PLAIN, 24));
+        editSkills.setBackground(new Color(64, 74, 86));
+        editSkills.setForeground(Color.WHITE); 
 
         questButton.setPreferredSize(new Dimension(250, 500));
         questButton.addActionListener(new ActionListener() {
@@ -62,10 +78,12 @@ public class Main extends JFrame{
         
                 // Create the JFrame for updating skills
                 JFrame skill = new JFrame("Update Skills");
+                skill.getContentPane().setBackground(new Color(64, 74, 86));
                 JCheckBox[] boxes = new JCheckBox[skillsList.size()];
+
                 JPanel checkboxPanel = new JPanel();
                 checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS)); // Stack checkboxes vertically
-        
+                checkboxPanel.setBackground(new Color(64, 74, 86));
                 // Create checkboxes for all skills
                 for (int i = 0; i < skillsList.size(); i++) {
                     boxes[i] = new JCheckBox(skillsList.get(i));
@@ -73,15 +91,23 @@ public class Main extends JFrame{
                     if (existingSkills.contains(skillsList.get(i))) {
                         boxes[i].setSelected(true);
                     }
+                    boxes[i].setBackground(new Color(64, 74, 86));
+                    boxes[i].setForeground(Color.WHITE);
+                    boxes[i].setFont(new Font("Arial", Font.PLAIN, 16));
                     checkboxPanel.add(boxes[i]);
                 }
+
+                JScrollPane scrollPane = new JScrollPane(checkboxPanel);
+                scrollPane.setPreferredSize(new Dimension(450, 400));
         
                 // Add submit button
                 JButton submit = new JButton("Submit");
+                submit.setBackground(new Color(14, 0, 0));
+                submit.setForeground(Color.WHITE);
                 submit.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         // Append selected skills back to the file
-                        try (FileWriter writer = new FileWriter("skills.txt", true)) {
+                        try (FileWriter writer = new FileWriter("skills.txt")) {
                             for (int i = 0; i < boxes.length; i++) {
                                 if (boxes[i].isSelected() && !existingSkills.contains(boxes[i].getText())) {
                                     writer.write(boxes[i].getText() + "\n"); // Only append if not already in the file
@@ -96,8 +122,9 @@ public class Main extends JFrame{
         
                 // Set layout and add components
                 JPanel buttonPanel2 = new JPanel();
+                buttonPanel2.setBackground(new Color(64, 74, 86));
                 buttonPanel2.add(submit);
-                skill.add(checkboxPanel, BorderLayout.CENTER);
+                skill.add(scrollPane, BorderLayout.CENTER);
                 skill.add(buttonPanel2, BorderLayout.SOUTH); // Submit button at the bottom
         
                 // Final JFrame setup

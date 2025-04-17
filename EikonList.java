@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -19,12 +18,26 @@ class EikonList extends JFrame{
         super("Eikons");
         setLayout(new BorderLayout());
         JLabel label = new JLabel("Eikon List", SwingConstants.CENTER);
-        JButton mainButton = new JButton("Back to Main Menu");
-        JButton ranButton = new JButton("Randomize Eikons");
-        JLabel skill = new JLabel();
-        File userSkills = new File("skills.txt");
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.BOLD, 48));
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 500, 450));
+        buttonPanel.setBackground(new Color(14, 0, 0));
+
+        JButton mainButton = new JButton("Back to Main Menu");
+        mainButton.setFont(new Font("Arial", Font.PLAIN, 24));
+        mainButton.setBackground(new Color(64, 74, 86));
+        mainButton.setForeground(Color.WHITE); 
+
+        JButton ranButton = new JButton("Randomize Eikons");
+        ranButton.setFont(new Font("Arial", Font.PLAIN, 24));
+        ranButton.setBackground(new Color(64, 74, 86));
+        ranButton.setForeground(Color.WHITE); 
+
+        JLabel skill = new JLabel();
+        File userSkills = new File("skills.txt");
+        
         if(userSkills.length() == 0){
             new startupSkills();
             dispose();
@@ -50,6 +63,7 @@ class EikonList extends JFrame{
                     getContentPane().remove(currentSkillLabel);
                 }
                 skill.setText("<html>" + skillText.replace("\n", "<br>") + "</html>");
+                skill.setForeground(Color.WHITE);
                 currentSkillLabel = skill;
                 revalidate();
                 repaint();
@@ -180,23 +194,31 @@ class startupSkills extends JFrame {
     // Create an array of JCheckBox for each skill
     JCheckBox[] boxes = new JCheckBox[skills.length];
     JPanel checkboxPanel = new JPanel();
-    JButton submit = new JButton();
+    JButton submit = new JButton("Submit");
     public startupSkills() {
         
         // Set Layout for JPanel to make the checkboxes stack properly
         checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS));
+        checkboxPanel.setBackground(new Color(64, 74, 86));
         for (int i = 0; i < skills.length; i++) {
             boxes[i] = new JCheckBox(skills[i]);
+            boxes[i].setBackground(new Color(64, 74, 86));
+            boxes[i].setForeground(Color.WHITE);
+            boxes[i].setFont(new Font("Arial", Font.PLAIN, 16));
             checkboxPanel.add(boxes[i]);
         }
 
-        
+        JScrollPane scrollPane = new JScrollPane(checkboxPanel);
+        scrollPane.setPreferredSize(new Dimension(450, 400));
+
         // Configure the JFrame
         JFrame startup = new JFrame("Startup Skills");
+        startup.getContentPane().setBackground(new Color(64, 74, 86));
         startup.setLayout(new BorderLayout());
         startup.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        startup.add(checkboxPanel, BorderLayout.CENTER);
+        startup.add(scrollPane, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(64, 74, 86));
         buttonPanel.add(submit);
         startup.add(buttonPanel, BorderLayout.SOUTH);
         
@@ -211,7 +233,9 @@ class startupSkills extends JFrame {
                 dispose();
             }
         });
-        submit.setSize(400, 400);
+        submit.setPreferredSize(new Dimension(100, 50));
+        submit.setBackground(new Color(14, 0, 0));
+        submit.setForeground(Color.WHITE);
         startup.setVisible(true);
     }
 

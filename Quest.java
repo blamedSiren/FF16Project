@@ -1,13 +1,14 @@
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
-
 import javax.swing.*;
-import javax.swing.border.Border;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.awt.*;
+
+
 
 
 public class Quest extends JFrame {
@@ -60,17 +61,30 @@ public class Quest extends JFrame {
         "Priceless",
         "Silver Linings"
     };
+    private ArrayList<String> completedQuests = new ArrayList<>();
     public Quest() {
         super("Quests");
+        getContentPane().setBackground(new Color(14, 0, 0));
         setLayout(new BorderLayout()); // Two rows: One for the label, one for the buttons
         JLabel label = new JLabel("Quests", SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.BOLD, 48));
 
-        // Create a panel for the button with GridLayout
+        // Create a panel for the button with FlowLayout
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(14, 0, 0));
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 350, 450)); // 1 row, 1 column
 
         JButton mainButton = new JButton("Back to Main Menu");
         mainButton.setPreferredSize(new Dimension(250, 500));
+        mainButton.setFont(new Font("Arial", Font.PLAIN, 24));
+        mainButton.setBackground(new Color(64, 74, 86));
+        mainButton.setForeground(Color.WHITE); 
+
+        JButton submitButton = new JButton("Submit");
+        submitButton.setBackground(new Color(14, 0, 0));
+        submitButton.setForeground(Color.WHITE);
+        submitButton.setPreferredSize(new Dimension(100,100));
 
         mainButton.addActionListener(new ActionListener() {
             @Override
@@ -78,22 +92,62 @@ public class Quest extends JFrame {
                 new Main();
                 dispose();
             }
-        });
+        });                     
+
+        try(BufferedReader reader = new BufferedReader(new FileReader("completedQuests.txt"))){
+            String line; 
+            while((line = reader.readLine()) != null){
+                completedQuests.add(line.trim());
+            }
+        }
+        catch(IOException b){
+            b.printStackTrace();
+        }
+       
 
         JPanel questCheckbox = new JPanel();
         JCheckBox[] boxes = new JCheckBox[questList.length];
         
         questCheckbox.setLayout(new BoxLayout(questCheckbox, BoxLayout.Y_AXIS));
+        questCheckbox.setBackground(new Color(64, 74, 86));
         questCheckbox.setPreferredSize(new Dimension(500, 500));
         for(int i = 0; i < questList.length; i++){
             boxes[i] = new JCheckBox(questList[i]);
+            if(completedQuests.contains(questList[i])){
+                boxes[i].setSelected(true);
+            }
+            boxes[i].setBackground(new Color(64, 74, 86));
+            boxes[i].setForeground(Color.WHITE);
+            boxes[i].setFont(new Font("Arial", Font.PLAIN, 16));
             questCheckbox.add(boxes[i]);
         }
         JScrollPane scroll = new JScrollPane(questCheckbox);
+        
+
+        submitButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                try(FileWriter writer = new FileWriter("completedQuests.txt", true)){
+                    for(int i = 0; i < questList.length; i++){
+                        if(boxes[i].isSelected()){
+                            writer.write(questList[i] + "\n");
+                        }
+                    }
+                }
+                catch(IOException a){
+                    a.printStackTrace();
+                }
+                
+            }
+        });
+
+        questCheckbox.add(submitButton, BorderLayout.SOUTH);
         buttonPanel.add(mainButton);
 
-        add(label);         // Add label in the first row
-        add(buttonPanel);   // Add button panel in the second row
+
+        
+        add(label, BorderLayout.NORTH) ;         // Add label in the first row
+        add(buttonPanel, BorderLayout.WEST);   // Add button panel in the second row
         add(scroll, BorderLayout.CENTER);
 
         setBounds(0, 0, screenSize.width, screenSize.height);

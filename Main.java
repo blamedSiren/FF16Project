@@ -1,149 +1,128 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import javax.swing.*;
 
-public class Main extends JFrame{
+public class Main extends JFrame {
     private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    public Main(){
+    public Main() {
         super("Main Menu");
         getContentPane().setBackground(new Color(14, 0, 0));
-        setLayout(new BorderLayout()); // Use BorderLayout for overall window layout
+        setLayout(new BorderLayout());
+
         JLabel label = new JLabel("Main Menu", SwingConstants.CENTER);
         label.setForeground(Color.WHITE);
-        label.setFont(new Font("Arial", Font.BOLD, 48));
-
+        label.setFont(new Font("Arial", Font.BOLD, screenSize.height / 20));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(new Color(14, 0, 0));
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 550, 450)); // FlowLayout for center alignment and spacing between buttons
-        
+
+        int buttonWidth = screenSize.width / 7;
+        int buttonHeight = screenSize.height / 2;
+        int hGap = screenSize.width / 7;
+        int vGap = screenSize.height / 12;
+
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, hGap, vGap));
+
         JButton questButton = new JButton("Quests");
-        questButton.setFont(new Font("Arial", Font.PLAIN, 24));
-        questButton.setBackground(new Color(64, 74, 86));
-        questButton.setForeground(Color.WHITE); 
-
         JButton eikonButton = new JButton("Eikons");
-        eikonButton.setFont(new Font("Arial", Font.PLAIN, 24));
-        eikonButton.setBackground(new Color(64, 74, 86));
-        eikonButton.setForeground(Color.WHITE); 
-
         JButton editSkills = new JButton("Edit Skills");
-        editSkills.setFont(new Font("Arial", Font.PLAIN, 24));
-        editSkills.setBackground(new Color(64, 74, 86));
-        editSkills.setForeground(Color.WHITE); 
 
-        questButton.setPreferredSize(new Dimension(250, 500));
-        questButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Quest();
-                dispose();
-            }
+        JButton[] buttons = { questButton, eikonButton, editSkills };
+        for (JButton btn : buttons) {
+            btn.setFont(new Font("Arial", Font.PLAIN, screenSize.height / 40));
+            btn.setBackground(new Color(64, 74, 86));
+            btn.setForeground(Color.WHITE);
+            btn.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
+        }
+
+        questButton.addActionListener(e -> {
+            new Quest();
+            dispose();
         });
 
-        editSkills.setPreferredSize(new Dimension(250, 500));
-        editSkills.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                String[] skills = {
-                    "Will o' the Wykes", "Limit Break", "Ignition", "Rising Flames", "Heatwave",
-                    "Flames of Rebirth", "Phoenix Shift", "Scarlet Cyclones", "Aerial Blast", "Rook's Gambit",
-                    "Deadly Embrace", "Wicked Wheel", "Gouge", "Pile Drive", "Lightning Rod", "Blind Justice",
-                    "Judgement Bolt", "Thunderstorm", "Raging Fists", "Windup", "Earthen Fury", "Titanic Block",
-                    "Upheaval", "Wings of Light", "Flare Breath", "Impulse", "Satellite", "Gigaflare", "Diamond Dust",
-                    "Rime", "Ice Age", "Mesmerize", "Cold Snap", "Gungnir", "Heaven's Cloud", "Rift Slip", 
-                    "Arm of Darkness", "Dancing Steel"
-                };
-        
-                ArrayList<String> skillsList = new ArrayList<>();
-                Collections.addAll(skillsList, skills);
-        
-                // Read current skills from the file and mark them as selected
-                ArrayList<String> existingSkills = new ArrayList<>();
-                try (BufferedReader r = new BufferedReader(new FileReader("skills.txt"))) {
-                    String line;
-                    while ((line = r.readLine()) != null) {
-                        existingSkills.add(line.trim());  // Collect existing skills
+        eikonButton.addActionListener(e -> {
+            new EikonList();
+            dispose();
+        });
+
+        editSkills.addActionListener(e -> {
+            String[] skills = {
+                "Will o' the Wykes", "Limit Break", "Ignition", "Rising Flames", "Heatwave",
+                "Flames of Rebirth", "Phoenix Shift", "Scarlet Cyclones", "Aerial Blast", "Rook's Gambit",
+                "Deadly Embrace", "Wicked Wheel", "Gouge", "Pile Drive", "Lightning Rod", "Blind Justice",
+                "Judgement Bolt", "Thunderstorm", "Raging Fists", "Windup", "Earthen Fury", "Titanic Block",
+                "Upheaval", "Wings of Light", "Flare Breath", "Impulse", "Satellite", "Gigaflare", "Diamond Dust",
+                "Rime", "Ice Age", "Mesmerize", "Cold Snap", "Gungnir", "Heaven's Cloud", "Rift Slip",
+                "Arm of Darkness", "Dancing Steel"
+            };
+
+            ArrayList<String> skillsList = new ArrayList<>();
+            Collections.addAll(skillsList, skills);
+
+            ArrayList<String> existingSkills = new ArrayList<>();
+            try (BufferedReader r = new BufferedReader(new FileReader("skills.txt"))) {
+                String line;
+                while ((line = r.readLine()) != null) {
+                    existingSkills.add(line.trim());
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            JFrame skill = new JFrame("Update Skills");
+            skill.getContentPane().setBackground(new Color(64, 74, 86));
+            JCheckBox[] boxes = new JCheckBox[skillsList.size()];
+
+            JPanel checkboxPanel = new JPanel();
+            checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS));
+            checkboxPanel.setBackground(new Color(64, 74, 86));
+
+            for (int i = 0; i < skillsList.size(); i++) {
+                boxes[i] = new JCheckBox(skillsList.get(i));
+                if (existingSkills.contains(skillsList.get(i))) {
+                    boxes[i].setSelected(true);
+                }
+                boxes[i].setBackground(new Color(64, 74, 86));
+                boxes[i].setForeground(Color.WHITE);
+                boxes[i].setFont(new Font("Arial", Font.PLAIN, screenSize.height / 60));
+                checkboxPanel.add(boxes[i]);
+            }
+
+            JScrollPane scrollPane = new JScrollPane(checkboxPanel);
+            scrollPane.setPreferredSize(new Dimension(screenSize.width / 3, screenSize.height / 2));
+
+            JButton submit = new JButton("Submit");
+            submit.setBackground(new Color(14, 0, 0));
+            submit.setForeground(Color.WHITE);
+            submit.addActionListener(ev -> {
+                try (FileWriter writer = new FileWriter("skills.txt")) {
+                    for (JCheckBox box : boxes) {
+                        if (box.isSelected()) {
+                            writer.write(box.getText() + "\n");
+                        }
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-        
-                // Create the JFrame for updating skills
-                JFrame skill = new JFrame("Update Skills");
-                skill.getContentPane().setBackground(new Color(64, 74, 86));
-                JCheckBox[] boxes = new JCheckBox[skillsList.size()];
+                skill.dispose();
+            });
 
-                JPanel checkboxPanel = new JPanel();
-                checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS)); // Stack checkboxes vertically
-                checkboxPanel.setBackground(new Color(64, 74, 86));
-                // Create checkboxes for all skills
-                for (int i = 0; i < skillsList.size(); i++) {
-                    boxes[i] = new JCheckBox(skillsList.get(i));
-                    // Set the checkbox selected if the skill is in the existing skills list
-                    if (existingSkills.contains(skillsList.get(i))) {
-                        boxes[i].setSelected(true);
-                    }
-                    boxes[i].setBackground(new Color(64, 74, 86));
-                    boxes[i].setForeground(Color.WHITE);
-                    boxes[i].setFont(new Font("Arial", Font.PLAIN, 16));
-                    checkboxPanel.add(boxes[i]);
-                }
+            JPanel buttonPanel2 = new JPanel();
+            buttonPanel2.setBackground(new Color(64, 74, 86));
+            buttonPanel2.add(submit);
 
-                JScrollPane scrollPane = new JScrollPane(checkboxPanel);
-                scrollPane.setPreferredSize(new Dimension(450, 400));
-        
-                // Add submit button
-                JButton submit = new JButton("Submit");
-                submit.setBackground(new Color(14, 0, 0));
-                submit.setForeground(Color.WHITE);
-                submit.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        // Append selected skills back to the file
-                        try (FileWriter writer = new FileWriter("skills.txt")) {
-                            for (int i = 0; i < boxes.length; i++) {
-                                if (boxes[i].isSelected() && !existingSkills.contains(boxes[i].getText())) {
-                                    writer.write(boxes[i].getText() + "\n"); // Only append if not already in the file
-                                }
-                            }
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                        skill.dispose(); // Close the skill window
-                    }
-                });
-        
-                // Set layout and add components
-                JPanel buttonPanel2 = new JPanel();
-                buttonPanel2.setBackground(new Color(64, 74, 86));
-                buttonPanel2.add(submit);
-                skill.add(scrollPane, BorderLayout.CENTER);
-                skill.add(buttonPanel2, BorderLayout.SOUTH); // Submit button at the bottom
-        
-                // Final JFrame setup
-                skill.setSize(500, 600); // Adjust size to fit checkboxes and button
-                skill.setLocation((screenSize.width - skill.getWidth()) / 2, (screenSize.height - skill.getHeight()) / 2);
-                skill.setVisible(true);
-                skill.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close without exiting app
-            }
-        });
-        
-        
-
-        eikonButton.setPreferredSize(new Dimension(250, 500));
-        eikonButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e){
-                dispose();
-                new EikonList();
-            }
+            skill.add(scrollPane, BorderLayout.CENTER);
+            skill.add(buttonPanel2, BorderLayout.SOUTH);
+            skill.setSize(screenSize.width / 3 + 50, screenSize.height / 2 + 100);
+            skill.setLocationRelativeTo(null);
+            skill.setVisible(true);
+            skill.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         });
 
         buttonPanel.add(questButton);
@@ -153,9 +132,8 @@ public class Main extends JFrame{
         add(label, BorderLayout.NORTH);
         add(buttonPanel, BorderLayout.CENTER);
 
-        setBounds(0,0, screenSize.width, screenSize.height);
+        setBounds(0, 0, screenSize.width, screenSize.height);
         setVisible(true);
-        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

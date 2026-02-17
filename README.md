@@ -1,10 +1,10 @@
 # Program Overview
 
 ## 4 Main Files:
- - Run - Used to run the application and launch it
- - Main - The Class that is launched at the start of the application and essentially the main menu
- - Quest - The class that handles the quest checkboxs
- - EikonList - The class that handles the Eikon skill generation
+- Run - Used to run the application and launch it
+- Main - The Class that is launched at the start of the application and essentially the main menu
+- Quest - The class that handles the quest checkboxs
+- EikonList - The class that handles the Eikon skill generation
 
 ## Run Instructions
 There is little that is specifically needed to run the application. The launch requirements in order to get the application to work properly is the following:
